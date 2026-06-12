@@ -22,8 +22,7 @@ DUMP		-- dumps active memory addresses to the console
 ENTER		-- finishes an input stream (NOT CHANGEABLE)
 --]]
 
-local usage_string = "Read the included README.md for operations instructions."
-print(usage_string)
+local usage_string = "Read the included README.md for operational instructions."
 
 local ROM = emu.romname()
 local keys = {"INIT", "CMP", "STEP", "AUTO_STEP", "UNDO", "CONFIG", "DUMP"}
@@ -57,6 +56,7 @@ if rb then
 	get_inputs = function() return guiinputs.kb.inputs end -- fbneo will only serve the inputs once, so we need to get it from the fbneo-training-mode if it already grabbed it
 -- create config to add saving settings?
 else
+	print(usage_string)
 	FBNEO_TRAINING_MODE = false
 	get_inputs = input.get
 end

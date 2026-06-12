@@ -1,6 +1,6 @@
 -- https://github.com/peon2/Memory-Watcher/
 local MEMORY_HISTORY_MAX = 3
-local XOFFSET = 50
+local XOFFSET = 60
 local YOFFSET = 30
 local DISPLAY_COUNT = math.floor((emu.screenheight() - (YOFFSET + 15))/10)
 local MEMORY_OUTPUT_FORMAT = "0x%X: Value: 0x%X Starting Value: 0x%X"
@@ -8,7 +8,7 @@ local DEFAULT_MEMORY_START = 0x100000 -- neogeo defaults
 local DEFAULT_MEMORY_SIZE = 0x10000
 local DEFAULT_WORD_SIZE = 2
 
-local ROM = emu.romname()
+local DUMP_FILE = "memory.txt"
 local DEFAULT_KEYS = "ICSAUOD"
 --[[
 INIT		-- starts a new memory watch session
@@ -22,6 +22,7 @@ DUMP		-- dumps active memory addresses to the console
 ENTER		-- finishes an input stream (NOT CHANGEABLE)
 --]]
 
+local ROM = emu.romname()
 local keys = {"INIT", "CMP", "STEP", "AUTO_STEP", "UNDO", "CONFIG", "DUMP"}
 local input_key = {ENTER = "enter"}
 
@@ -150,7 +151,7 @@ local function step()
 	end
 	memorymap = new_memorymap
 
-	if active_addresses <= DISPLAY_COUNT then
+	if active_addresses <= DISPLAY_COUNT and active_addresses > 0 then
 		display_values = {}
 		print("Memory Watcher: ") -- print all these values, once, so they can be copied
 		for i = 0, memorylength do
@@ -166,7 +167,7 @@ end
 local function memoryDump()
 	gui.text(XOFFSET, YOFFSET-10, "Dumping active memory to file memory.txt...", "teal")
 	print("Dumping active memory to file memory.txt...")
-	local file = io.open("memory.txt", "w")
+	local file = io.open(DUMP_FILE, "w")
 	file:write(string.format("%s: Framecount %d, Starting Memory: 0x%X, Memory Size: 0x%X, Word Size: %d\n", ROM, fc, memorystart, memorysize, wordsize))
 	local linecnt = 0
 	for i = 0, memorylength do
@@ -325,11 +326,11 @@ local function config_input(key)
 		setKeys(input_stream)
 	end
 	for i, v in ipairs(keys) do
-		gui.text(XOFFSET, YOFFSET+i*10, v..": ", "teal")
+		gui.text(1, YOFFSET+10+i*10, v..": ", "teal")
 		if i == input_stage then
-			gui.text(XOFFSET+44, YOFFSET+i*10, input_key[v], "red")
+			gui.text(45, YOFFSET+10+i*10, input_key[v], "red")
 		else
-			gui.text(XOFFSET+44, YOFFSET+i*10, input_key[v], "white")
+			gui.text(45, YOFFSET+10+i*10, input_key[v], "white")
 		end
 	end
 	if PRESSED(input_key.ENTER) or input_stage > #keys then
@@ -390,6 +391,10 @@ local function update()
 		end
 		previous_key = key
 	else
+		for i, v in ipairs(keys) do -- show buttons to press
+			gui.text(1, YOFFSET+10+i*10, v..": ", "teal")
+			gui.text(45, YOFFSET+10+i*10, input_key[v], "white")
+		end
 		if memory_active then
 			if hasArgument(funcname) then
 				gui.text(XOFFSET, YOFFSET, string.format(inittext1..inittext2.."%X with Operation '%s' '0x%X'.", memorystart, memorystart+memorysize, funcname, cmp_constant))
@@ -397,11 +402,6 @@ local function update()
 				gui.text(XOFFSET, YOFFSET, string.format(inittext1..inittext2.."%X with Operation '%s'.", memorystart, memorystart+memorysize, funcname))
 			end
 			gui.text(XOFFSET, YOFFSET+10, string.format(inittext3.."%d with %d active addresses.", wordsize, active_addresses))
-		else
-			for i, v in ipairs(keys) do
-				gui.text(XOFFSET, YOFFSET+i*10, v..": ", "teal")
-				gui.text(XOFFSET+44, YOFFSET+i*10, input_key[v], "white")
-			end
 		end
 		if display_values then
 			for index, disp in ipairs(display_values) do

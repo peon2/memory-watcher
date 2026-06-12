@@ -22,6 +22,9 @@ DUMP		-- dumps active memory addresses to the console
 ENTER		-- finishes an input stream (NOT CHANGEABLE)
 --]]
 
+local usage_string = "Read the included README.md for operations instructions."
+print(usage_string)
+
 local ROM = emu.romname()
 local keys = {"INIT", "CMP", "STEP", "AUTO_STEP", "UNDO", "CONFIG", "DUMP"}
 local input_key = {ENTER = "enter"}
@@ -365,6 +368,7 @@ local function update()
 		if fc%120 == 0 then for letter, _ in ipairs(script_lock_chars) do script_lock_chars[script_lock_chars[letter]] = false end end -- reset every 2 seconds
 		gui.text(XOFFSET, YOFFSET, "Loaded Memory Watcher Script:", "teal")
 		gui.text(XOFFSET, YOFFSET+10, script_lock_text, "teal")
+		gui.text(XOFFSET, YOFFSET+20, usage_string, "teal")
 		local xoffset2 = 28
 		local bools = true
 		for _, letter in ipairs(script_lock_chars) do

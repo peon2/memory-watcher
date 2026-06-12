@@ -1,3 +1,5 @@
+Grab the latest version of this script from [my github](https://github.com/peon2/memory-watcher).
+
 # Memory Watcher
 
 A simple Memory Watching tool for use with FBNEO or MAME.\
